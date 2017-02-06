@@ -8,19 +8,20 @@ from planes
 where speed is not null;
 
 
+
 /* Question 2. What is the total distance flown by all of the planes in January 2013? 
 What is the total distance flown by all of the planes in January 2013 
 where the tailnum is missing?
 
-/* Total distance flown by all of the planes in January 2013 is 350217607 */
+/* Total distance flown by all of the planes in January 2013 is 27188805 */
 select sum(distance) as Total_Distance 
-from flights;
+from flights
 where year='2013' 
 and month='1';
 
-/* Total distance where tailnum is missing is 350217607 */
+/* Total distance where tailnum is missing is 81763 */
 select sum(distance) as Total_Distance 
-from flights;
+from flights
 where year='2013' 
 and month='1'
 and tailnum is null;
@@ -32,12 +33,41 @@ and tailnum is null;
 INNER JOIN, then using a LEFT OUTER JOIN. How do your results compare? */
 
 /* With inner join*/ 
-select pl.manufacturer, fl.distance
-from planes as pl
-inner join flights as fl
+select pl.manufacturer, sum(fl.distance) as total_distance
+from flights as fl
+inner join planes as pl 
+on fl.tailnum=pl.tailnum
 where fl.year='2013' 
 and fl.month='7'
-and fl.day='5';
-on pl.tailnum=fl.tailnum
+and fl.day='5'
 group by pl.manufacturer
+order by pl.manufacturer;
 
+/* With Outher join. 
+Difference: With outher left join we can see total distance for fanufacturer without a name (NULL)*/
+select pl.manufacturer, sum(fl.distance) as total_distance
+from flights as fl
+left outer join planes as pl 
+on fl.tailnum=pl.tailnum
+where fl.year='2013' 
+and fl.month='7'
+and fl.day='5'
+group by pl.manufacturer
+order by pl.manufacturer;
+
+
+
+/* Question 4. Show me list of airline's full name departed from 
+'John F Kennedy Intl' airport for the month of February 2013 */ 
+
+select airports.name as airport_name, airlines.name as airline_name
+from airports 
+join flights
+on airports.faa=flights.origin
+join airlines
+on flights.carrier=airlines.carrier 
+where airports.name='John F Kennedy Intl'
+and flights.origin='JFK'
+and flights.year='2013'
+and flights.month='2'
+group by airlines.name;
